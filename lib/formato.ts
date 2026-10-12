@@ -23,6 +23,12 @@ export function bsConSigno(n: number): string {
   return `${n > 0 ? "+" : n < 0 ? "−" : ""}Bs ${miles},${dec}`;
 }
 
+/** 0.6612 → "66%" */
+export function pct(n: number | null | undefined): string {
+  if (n === null || n === undefined || !Number.isFinite(n)) return "—";
+  return `${Math.round(n * 100)}%`;
+}
+
 /** Variación porcentual contra el período anterior; null si no hay base. */
 export function variacion(actual: number, anterior: number): number | null {
   if (!anterior) return null;

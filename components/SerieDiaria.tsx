@@ -1,7 +1,9 @@
 import { bs, diaMes } from "@/lib/formato";
-import type { Resumen } from "@/lib/tipos";
 
 const ALTO = 210;
+
+export type Tramo = { nombre: string; clase: string; color: string };
+export type DiaSerie = { fecha: string; valores: [number, number] };
 
 /** Escala "redonda" para el eje: 100k, 50k, 20k… */
 function techo(max: number): number {
@@ -17,33 +19,49 @@ function corto(n: number): string {
   return String(n);
 }
 
-/** Barras apiladas por día: pedidos arriba, retail en la base. */
-export function SerieDiaria({ serie }: { serie: Resumen["serie"] }) {
-  const max = techo(Math.max(0, ...serie.map((d) => d.pedidos + d.retail)));
+/**
+ * Barras apiladas por día con dos tramos: el primero arriba, el segundo en la base.
+ * Resumen: pedidos / retail. Almacén: despacho / retail.
+ */
+export function SerieDiaria({
+  titulo,
+  dias,
+  tramos,
+}: {
+  titulo: string;
+  dias: DiaSerie[];
+  tramos: [Tramo, Tramo];
+}) {
+  const totalDia = (d: DiaSerie) => d.valores[0] + d.valores[1];
+  const max = techo(Math.max(0, ...dias.map(totalDia)));
   const marcas = [1, 0.75, 0.5, 0.25, 0].map((f) => corto(max * f));
-  const cadaCuanto = serie.length > 45 ? 7 : serie.length > 20 ? 2 : 1;
+  const cadaCuanto = dias.length > 45 ? 7 : dias.length > 20 ? 2 : 1;
 
   // El día que más pesó, para el titular del gráfico.
-  const pico = serie.reduce((a, d) => (d.pedidos + d.retail > a.pedidos + a.retail ? d : a), serie[0] ?? { fecha: "", pedidos: 0, retail: 0 });
-  const total = serie.reduce((s, d) => s + d.pedidos + d.retail, 0);
-  const share = total > 0 ? ((pico.pedidos + pico.retail) / total) * 100 : 0;
+  const pico = dias.reduce<DiaSerie | null>((a, d) => (!a || totalDia(d) > totalDia(a) ? d : a), null);
+  const total = dias.reduce((s, d) => s + totalDia(d), 0);
+  const share = pico && total > 0 ? (totalDia(pico) / total) * 100 : 0;
 
   return (
-    <section aria-label="Vendido por día" className="vidrio panel" style={{ gap: 18 }}>
+    <section aria-label={titulo} className="vidrio panel" style={{ gap: 18 }}>
       <div className="panel-cabeza">
         <div>
-          <h2>Vendido por día</h2>
-          {total > 0 ? (
+          <h2>{titulo}</h2>
+          {pico && total > 0 ? (
             <div className="panel-sub">
-              El día más fuerte fue el {diaMes(pico.fecha)}: {bs(pico.pedidos + pico.retail)}, el {Math.round(share)}% del período
+              El día más fuerte fue el {diaMes(pico.fecha)}: {bs(totalDia(pico))}, el {Math.round(share)}% del período
             </div>
           ) : (
-            <div className="panel-sub">Sin ventas en el período</div>
+            <div className="panel-sub">Sin movimiento en el período</div>
           )}
         </div>
         <div className="leyenda">
-          <span><span aria-hidden="true" className="muestra" style={{ background: "var(--pedidos)" }} />Pedidos</span>
-          <span><span aria-hidden="true" className="muestra" style={{ background: "var(--retail)" }} />Retail (mostrador + VTD)</span>
+          {tramos.map((t) => (
+            <span key={t.nombre}>
+              <span aria-hidden="true" className="muestra" style={{ background: t.color }} />
+              {t.nombre}
+            </span>
+          ))}
         </div>
       </div>
       <div className="grafico-scroll">
@@ -54,20 +72,29 @@ export function SerieDiaria({ serie }: { serie: Resumen["serie"] }) {
             ))}
           </div>
           <div className="area">
-            <div className="columnas" role="img" aria-label={`Barras apiladas de ventas diarias del ${diaMes(serie[0]?.fecha ?? "")} al ${diaMes(serie.at(-1)?.fecha ?? "")}`}>
-              {serie.map((d) => {
-                const hp = d.pedidos > 0 ? Math.max(2, Math.round((d.pedidos / max) * ALTO)) : 0;
-                const hr = d.retail > 0 ? Math.max(2, Math.round((d.retail / max) * ALTO)) : 0;
+            <div
+              className="columnas"
+              role="img"
+              aria-label={`${titulo}: barras apiladas del ${diaMes(dias[0]?.fecha ?? "")} al ${diaMes(dias.at(-1)?.fecha ?? "")}`}
+            >
+              {dias.map((d) => {
+                const [a, b] = d.valores;
+                const ha = a > 0 ? Math.max(2, Math.round((a / max) * ALTO)) : 0;
+                const hb = b > 0 ? Math.max(2, Math.round((b / max) * ALTO)) : 0;
                 return (
-                  <div key={d.fecha} className="columna" title={`${diaMes(d.fecha)} · pedidos ${bs(d.pedidos)} · retail ${bs(d.retail)}`}>
-                    {hp > 0 ? <div className="tramo tramo-pedidos" style={{ height: hp }} /> : null}
-                    {hr > 0 ? <div className="tramo tramo-retail" style={{ height: hr }} /> : null}
+                  <div
+                    key={d.fecha}
+                    className="columna"
+                    title={`${diaMes(d.fecha)} · ${tramos[0].nombre.toLowerCase()} ${bs(a)} · ${tramos[1].nombre.toLowerCase()} ${bs(b)}`}
+                  >
+                    {ha > 0 ? <div className={`tramo ${tramos[0].clase}`} style={{ height: ha }} /> : null}
+                    {hb > 0 ? <div className={`tramo ${tramos[1].clase}`} style={{ height: hb }} /> : null}
                   </div>
                 );
               })}
             </div>
             <div aria-hidden="true" className="fechas mono">
-              {serie.map((d, i) => (
+              {dias.map((d, i) => (
                 <span key={d.fecha}>{i % cadaCuanto === 0 ? d.fecha.slice(8, 10) : ""}</span>
               ))}
             </div>
@@ -77,3 +104,7 @@ export function SerieDiaria({ serie }: { serie: Resumen["serie"] }) {
     </section>
   );
 }
+
+export const TRAMO_PEDIDOS: Tramo = { nombre: "Pedidos", clase: "tramo-pedidos", color: "var(--pedidos)" };
+export const TRAMO_DESPACHO: Tramo = { nombre: "Despacho de pedidos", clase: "tramo-pedidos", color: "var(--pedidos)" };
+export const TRAMO_RETAIL: Tramo = { nombre: "Retail (mostrador + VTD)", clase: "tramo-retail", color: "var(--retail)" };

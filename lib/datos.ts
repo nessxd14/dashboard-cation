@@ -1,7 +1,7 @@
 import "server-only";
 import { cache } from "react";
 import { crearClienteServidor } from "./supabase/server";
-import type { IndicadorSalud, Resumen } from "./tipos";
+import type { Almacen, IndicadorSalud, Resumen, Ventas } from "./tipos";
 
 /** Error con un mensaje que se puede mostrar tal cual en pantalla. */
 export class ErrorDatos extends Error {
@@ -20,7 +20,7 @@ function traducir(error: { code?: string; message: string }): ErrorDatos {
   // PGRST202: la función no existe en el schema cache → la migración no está aplicada.
   if (error.code === "PGRST202" || /could not find the function/i.test(error.message)) {
     return new ErrorDatos(
-      "La capa analitica todavía no está aplicada en la base (migración 2026-10-12_analitica_fase0.sql).",
+      "Falta aplicar una migración del dashboard en la base (carpeta supabase/migrations).",
       "sin_migracion",
     );
   }
@@ -48,6 +48,20 @@ export async function obtenerResumen(desde: string, hasta: string): Promise<Resu
   const { data, error } = await supabase.rpc("dash_resumen", { p_desde: desde, p_hasta: hasta });
   if (error) throw traducir(error);
   return data as Resumen;
+}
+
+export async function obtenerVentas(desde: string, hasta: string): Promise<Ventas> {
+  const supabase = await crearClienteServidor();
+  const { data, error } = await supabase.rpc("dash_ventas", { p_desde: desde, p_hasta: hasta });
+  if (error) throw traducir(error);
+  return data as Ventas;
+}
+
+export async function obtenerAlmacen(desde: string, hasta: string): Promise<Almacen> {
+  const supabase = await crearClienteServidor();
+  const { data, error } = await supabase.rpc("dash_almacen", { p_desde: desde, p_hasta: hasta });
+  if (error) throw traducir(error);
+  return data as Almacen;
 }
 
 export const obtenerSalud = cache(async (): Promise<IndicadorSalud[]> => {

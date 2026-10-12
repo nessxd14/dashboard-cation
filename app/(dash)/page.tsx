@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Periodos } from "@/components/Periodos";
-import { SerieDiaria } from "@/components/SerieDiaria";
+import { SerieDiaria, TRAMO_PEDIDOS, TRAMO_RETAIL } from "@/components/SerieDiaria";
 import { Kpi, ListaBarras, Panel } from "@/components/piezas";
 import { ListaSalud } from "@/components/ListaSalud";
 import { Chismosa } from "@/components/Chismosa";
@@ -81,7 +81,11 @@ export default async function ResumenPage({
         />
       </section>
 
-      <SerieDiaria serie={r.serie} />
+      <SerieDiaria
+        titulo="Vendido por día"
+        tramos={[TRAMO_PEDIDOS, TRAMO_RETAIL]}
+        dias={r.serie.map((d) => ({ fecha: d.fecha, valores: [d.pedidos, d.retail] }))}
+      />
 
       <div className="rejilla">
         <Panel titulo="Vendido por canal" id="ventas">

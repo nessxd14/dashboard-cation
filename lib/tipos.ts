@@ -50,3 +50,43 @@ export type IndicadorSalud = {
   valor: number;
   unidad: "Bs" | null;
 };
+
+/** Forma del JSON de public.dash_ventas(desde, hasta). */
+export type Ventas = {
+  periodo: { desde: string; hasta: string; dias: number };
+  total: number;
+  prev: number;
+  ventas_retail: number;
+  pedidos: number;
+  ticket_retail: number;
+  ticket_pedido: number;
+  por_canal: { canal: string; docs: number; monto: number; ticket: number }[];
+  entrega: { vendido: number; entregado: number; pedidos_completos: number; pedidos: number };
+  por_vendedor: { vendedor: string; docs: number; monto: number }[];
+  top_clientes: { cliente: string; docs: number; monto: number }[];
+  top_productos: { descripcion: string; cantidad: number; monto: number }[];
+  cotizaciones: { creadas: number; convertidas: number; monto: number; monto_convertido: number };
+  pendientes: { numero: string; cliente: string; creado: string; vendido: number; pendiente: number }[];
+};
+
+/** Forma del JSON de public.dash_almacen(desde, hasta). */
+export type Almacen = {
+  periodo: { desde: string; hasta: string; dias: number };
+  salidas_valor: number;
+  salidas_movimientos: number;
+  entradas_unidades: number;
+  ajustes_neto: number;
+  por_origen: { origen: string; movimientos: number; unidades: number; valor: number | null }[];
+  serie: { fecha: string; despacho: number; retail: number }[];
+  despacho: {
+    pedidos_completados: number;
+    horas_mediana: number | null;
+    pedidos_abiertos: number;
+    lineas_por_despachar: number;
+    atrasados: { numero: string; cliente: string; dias: number; lineas: number }[];
+  };
+  por_comprar: { total: number; items: { descripcion: string; cantidad: number; dias: number; origen: string | null }[] };
+  traslados_en_transito: { total: number; items: { numero: string; despachado: string | null; dias: number; lineas: number }[] };
+  sin_movimiento: { total: number; items: { producto: string; stock: number }[] };
+  top_salidas: { producto: string; unidades: number; valor: number | null }[];
+};
