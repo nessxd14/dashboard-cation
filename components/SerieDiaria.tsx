@@ -108,3 +108,4 @@ export function SerieDiaria({
 export const TRAMO_PEDIDOS: Tramo = { nombre: "Pedidos", clase: "tramo-pedidos", color: "var(--pedidos)" };
 export const TRAMO_DESPACHO: Tramo = { nombre: "Despacho de pedidos", clase: "tramo-pedidos", color: "var(--pedidos)" };
 export const TRAMO_RETAIL: Tramo = { nombre: "Retail (mostrador + VTD)", clase: "tramo-retail", color: "var(--retail)" };
+export const TRAMO_CUENTA: Tramo = { nombre: "Cuenta de clientes", clase: "tramo-cuenta", color: "var(--cobrado)" };

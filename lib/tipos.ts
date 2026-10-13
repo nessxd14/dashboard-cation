@@ -90,3 +90,59 @@ export type Almacen = {
   sin_movimiento: { total: number; items: { producto: string; stock: number }[] };
   top_salidas: { producto: string; unidades: number; valor: number | null }[];
 };
+
+/** Forma del JSON de public.dash_finanzas(desde, hasta). */
+export type Finanzas = {
+  periodo: { desde: string; hasta: string; dias: number };
+  cobranza: {
+    total: number;
+    prev: number;
+    retail: number;
+    cuenta: number;
+    por_medio: { medio: string; monto: number; n: number }[];
+    serie: { fecha: string; cuenta: number; retail: number }[];
+    por_verificar: { n: number; monto: number };
+  };
+  cartera: {
+    total: number;
+    clientes: number;
+    vencido: number;
+    sin_reloj: number;
+    sin_partida: number;
+    antiguedad: { tramo: string; monto: number; partidas: number }[];
+    clientes_top: {
+      cliente: string;
+      saldo: number;
+      vencido: number;
+      dias_vencido: number | null;
+      ultimo_pago: string | null;
+      situacion: string | null;
+    }[];
+  };
+  caja: {
+    turnos: number;
+    sobrante: number;
+    faltante: number;
+    con_diferencia: number;
+    lista: {
+      id: number;
+      cajero: string;
+      estado: "ABIERTA" | "CERRADA" | "EN_REVISION";
+      abierta: string;
+      cerrada: string | null;
+      diferencia: number | null;
+      revisada_por: string | null;
+      nota: string | null;
+    }[];
+    gastos: { aprobado: number; pendiente: number; rechazado: number; n_pendiente: number };
+    remesas: number;
+    inyecciones: number;
+  };
+  faltantes: { estado: string; n: number; monto: number }[];
+  comisiones: {
+    devengadas: number;
+    potenciales: number;
+    liquidadas: number;
+    por_vendedor: { vendedor: string; monto: number; docs: number }[];
+  };
+};

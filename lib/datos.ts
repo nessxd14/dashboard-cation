@@ -1,7 +1,7 @@
 import "server-only";
 import { cache } from "react";
 import { crearClienteServidor } from "./supabase/server";
-import type { Almacen, IndicadorSalud, Resumen, Ventas } from "./tipos";
+import type { Almacen, Finanzas, IndicadorSalud, Resumen, Ventas } from "./tipos";
 
 /** Error con un mensaje que se puede mostrar tal cual en pantalla. */
 export class ErrorDatos extends Error {
@@ -62,6 +62,13 @@ export async function obtenerAlmacen(desde: string, hasta: string): Promise<Alma
   const { data, error } = await supabase.rpc("dash_almacen", { p_desde: desde, p_hasta: hasta });
   if (error) throw traducir(error);
   return data as Almacen;
+}
+
+export async function obtenerFinanzas(desde: string, hasta: string): Promise<Finanzas> {
+  const supabase = await crearClienteServidor();
+  const { data, error } = await supabase.rpc("dash_finanzas", { p_desde: desde, p_hasta: hasta });
+  if (error) throw traducir(error);
+  return data as Finanzas;
 }
 
 export const obtenerSalud = cache(async (): Promise<IndicadorSalud[]> => {
