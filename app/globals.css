@@ -62,7 +62,9 @@ button {
 .escena {
   position: relative;
   min-height: 100vh;
+  min-height: 100dvh;
   overflow: hidden;
+  overflow: clip; /* clip no crea contenedor de scroll: el menú "sticky" sigue pegado */
 }
 .luz {
   position: absolute;
@@ -335,3 +337,128 @@ tr:last-child td { border-bottom: 0; }
 .tabla-scroll { overflow-x: auto; }
 .tabla-scroll table { min-width: 560px; }
 .nota-debil { color: var(--aviso-texto); }
+
+/* =====================================================================
+   Celular y tablet
+   ===================================================================== */
+.solo-movil { display: none; }
+.menu-barra { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.periodos-opciones { display: flex; flex-wrap: wrap; gap: 4px; }
+
+@media (max-width: 820px) {
+  :root { --blur: blur(14px) saturate(140%); --radio: 18px; }
+  .solo-movil { display: revert; }
+  .solo-escritorio { display: none !important; }
+
+  .marco {
+    flex-direction: column; flex-wrap: nowrap; align-items: stretch; gap: 12px;
+    padding: 0 max(12px, env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  }
+
+  /* Menú: barra fija arriba con la marca, "Cuenta" y las pantallas en una fila deslizable. */
+  .menu {
+    position: sticky; top: 0; z-index: 20; max-width: none; min-width: 0; min-height: 0; flex: none;
+    margin: 0 calc(-1 * max(12px, env(safe-area-inset-right))) 0 calc(-1 * max(12px, env(safe-area-inset-left)));
+    padding: calc(10px + env(safe-area-inset-top)) 12px 8px; gap: 8px;
+    border-radius: 0 0 18px 18px; border-top: 0;
+    background: rgba(10, 15, 32, 0.72);
+  }
+  .marca { padding: 0 4px; gap: 10px; }
+  .marca-logo { width: 30px; height: 30px; border-radius: 9px; }
+  .marca-nombre { font-size: 15px; }
+  .marca-sub { font-size: 11px; }
+
+  .nav {
+    flex-direction: row; gap: 6px; overflow-x: auto; scrollbar-width: none;
+    margin: 0 -12px; padding: 2px 12px; scroll-padding-inline: 12px;
+  }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav a {
+    flex: none; min-height: 40px; padding: 0 14px; border-radius: 999px; white-space: nowrap;
+    background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.1); justify-content: center;
+  }
+
+  .menu-cuenta { position: relative; }
+  .menu-cuenta summary {
+    list-style: none; cursor: pointer; min-height: 40px; display: inline-flex; align-items: center;
+    padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 600;
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16);
+  }
+  .menu-cuenta summary::-webkit-details-marker { display: none; }
+  .menu-cuenta[open] summary { background: rgba(255,255,255,.18); }
+  .menu-cuenta-caja {
+    position: absolute; right: 0; top: calc(100% + 8px); width: min(280px, calc(100vw - 24px));
+    padding: 14px; display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--texto-2);
+    background: rgba(18, 24, 44, 0.96); border-radius: 16px;
+  }
+  .menu-cuenta-caja strong { color: var(--texto); word-break: break-all; }
+  .menu-cuenta-caja .boton-texto { font-size: 14px; min-height: 40px; }
+
+  .luz-1 { width: 380px; height: 380px; }
+  .luz-2 { width: 420px; height: 420px; top: 520px; }
+  .luz-3 { width: 440px; height: 440px; }
+  .luz-4 { display: none; }
+}
+
+@media (max-width: 560px) {
+  .encabezado { padding: 4px 2px 0; gap: 12px; align-items: stretch; flex-direction: column; }
+  .encabezado h1 { font-size: 26px; }
+  .subtitulo { font-size: 13px; margin-top: 2px; }
+
+  /* Períodos: las cuatro opciones a lo ancho y el rango debajo. */
+  .periodos { width: 100%; flex-direction: column; gap: 6px; }
+  .periodos-opciones { display: grid; grid-template-columns: repeat(4, 1fr); }
+  .periodos a { justify-content: center; padding: 0 6px; min-height: 40px; }
+  .rango { display: grid; grid-template-columns: 1fr 1fr auto; padding: 0; gap: 6px; }
+  .rango input { min-width: 0; width: 100%; min-height: 40px; font-size: 14px; }
+  .rango button { min-height: 40px; }
+
+  .pildoras { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -12px; padding: 0 12px; }
+  .pildoras::-webkit-scrollbar { display: none; }
+  .pildora { flex: none; white-space: nowrap; }
+
+  /* Cifras principales de a dos. */
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .kpi { padding: 14px; gap: 6px; border-radius: 16px; }
+  .kpi-cabeza { font-size: 12px; flex-wrap: wrap; }
+  .kpi-valor { font-size: clamp(17px, 5.2vw, 20px); white-space: nowrap; }
+  .kpi-nota { font-size: 11.5px; line-height: 1.4; }
+
+  .panel { padding: 16px; gap: 10px; }
+  .panel h2 { font-size: 16px; }
+  .panel-sub { font-size: 12px; }
+  .rejilla { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .fila { font-size: 13px; }
+  table { font-size: 12.5px; }
+  th, td { padding-right: 6px; }
+  th:last-child, td:last-child { padding-right: 0; }
+
+  /* Gráfico: un mes entra sin deslizar. */
+  .grafico { min-width: 0; gap: 6px; }
+  .eje { width: 32px; font-size: 10px; }
+  .columnas, .fechas { gap: 2px; }
+  .fecha-menor { visibility: hidden; }
+
+  /* Tabla de turnos: cada turno es una tarjeta. */
+  .tabla-scroll table.tabla-tarjetas { min-width: 0; }
+  .tabla-tarjetas thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .tabla-tarjetas tbody { display: flex; flex-direction: column; gap: 8px; }
+  .tabla-tarjetas tr {
+    display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center;
+    padding: 12px; border-radius: 14px; background: rgba(255,255,255,.05); border: 1px solid var(--linea);
+  }
+  .tabla-tarjetas td { padding: 0; border: 0; }
+  .tabla-tarjetas td.celda-titulo { font-weight: 600; }
+  .tabla-tarjetas td[data-etiqueta="Cajero"] { grid-column: 1; grid-row: 2; color: var(--texto-2); }
+  .tabla-tarjetas td[data-etiqueta="Estado"] { grid-column: 2; grid-row: 1; text-align: right; }
+  .tabla-tarjetas td[data-etiqueta="Diferencia"] { grid-column: 2; grid-row: 2; font-size: 14px; }
+  .tabla-tarjetas td.celda-ancha { grid-column: 1 / -1; font-size: 12px; color: var(--texto-2); }
+  .tabla-tarjetas td.celda-ancha:has(.apagado) { display: none; }
+  .tabla-tarjetas td.celda-ancha::before { content: "Revisó: "; color: var(--texto-3); }
+
+  .login-tarjeta { padding: 24px; }
+}
+
+@media (max-width: 360px) {
+  .kpis { grid-template-columns: minmax(0, 1fr); }
+}

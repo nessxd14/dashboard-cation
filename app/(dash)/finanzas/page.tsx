@@ -58,7 +58,7 @@ export default async function FinanzasPage({
         <Kpi
           nombre="Diferencias de caja"
           color={diferenciaNeta < 0 ? "var(--critico)" : "var(--aviso)"}
-          valor={bsConSigno(diferenciaNeta)}
+          valor={`${diferenciaNeta > 0 ? "+" : diferenciaNeta < 0 ? "−" : ""}${bs(Math.abs(diferenciaNeta))}`}
           nota={`${caja.con_diferencia} de ${caja.turnos} turnos con diferencia · faltó ${bs(-caja.faltante)}, sobró ${bs(caja.sobrante)}`}
         />
         <Kpi
@@ -178,7 +178,7 @@ export default async function FinanzasPage({
         }
       >
         <div className="tabla-scroll">
-          <table>
+          <table className="tabla-tarjetas">
             <thead>
               <tr>
                 <th scope="col">Turno</th>
@@ -194,17 +194,17 @@ export default async function FinanzasPage({
                 const chip = t.estado === "ABIERTA" ? "etiqueta-info" : t.estado === "EN_REVISION" ? "etiqueta-aviso" : "";
                 return (
                   <tr key={t.id}>
-                    <td className="mono">
+                    <td className="mono celda-titulo">
                       #{t.id} · {diaMes(fechaLaPaz(t.abierta))}
                     </td>
-                    <td>{t.cajero}</td>
-                    <td>
+                    <td data-etiqueta="Cajero">{t.cajero}</td>
+                    <td data-etiqueta="Estado">
                       <span className={`etiqueta ${chip}`}>{nombre(t.estado)}</span>
                     </td>
-                    <td className={`der mono ${grande ? "alerta" : t.diferencia === null ? "apagado" : ""}`}>
+                    <td data-etiqueta="Diferencia" className={`der mono ${grande ? "alerta" : t.diferencia === null ? "apagado" : ""}`}>
                       {t.diferencia === null ? "—" : bsConSigno(t.diferencia)}
                     </td>
-                    <td>
+                    <td data-etiqueta="Revisión" className="celda-ancha">
                       {t.revisada_por ? (
                         <>
                           {t.revisada_por}

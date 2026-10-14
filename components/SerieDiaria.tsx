@@ -65,7 +65,7 @@ export function SerieDiaria({
         </div>
       </div>
       <div className="grafico-scroll">
-        <div className="grafico">
+        <div className="grafico" style={dias.length > 45 ? { minWidth: dias.length * 9 + 60 } : undefined}>
           <div aria-hidden="true" className="eje mono">
             {marcas.map((m, i) => (
               <span key={i}>{m}</span>
@@ -95,7 +95,9 @@ export function SerieDiaria({
             </div>
             <div aria-hidden="true" className="fechas mono">
               {dias.map((d, i) => (
-                <span key={d.fecha}>{i % cadaCuanto === 0 ? d.fecha.slice(8, 10) : ""}</span>
+                <span key={d.fecha} className={i % 5 === 0 ? undefined : "fecha-menor"}>
+                  {i % cadaCuanto === 0 ? d.fecha.slice(8, 10) : ""}
+                </span>
               ))}
             </div>
           </div>
